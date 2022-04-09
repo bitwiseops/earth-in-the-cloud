@@ -1,0 +1,246 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="read_A1">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${in_a1}</file>
+    </parameters>
+  </node>
+  <node id="read_A2">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${in_a2}</file>
+    </parameters>
+  </node>
+  <node id="read_B1">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${in_b1}</file>
+    </parameters>
+  </node>
+  <node id="read_B2">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${in_b2}</file>
+    </parameters>
+  </node>
+  <node id="resample_A1">
+    <operator>Resample</operator>
+    <sources>
+      <sourceProduct refid="read_A1" />
+    </sources>
+    <parameters>
+      <targetResolution>10</targetResolution>
+      <upsampling>Nearest</upsampling>
+      <downsampling>First</downsampling>
+      <flagDownsampling>First</flagDownsampling>
+      <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+    </parameters>
+  </node>
+  <node id="resample_A2">
+    <operator>Resample</operator>
+    <sources>
+      <sourceProduct refid="read_A2" />
+    </sources>
+    <parameters>
+      <targetResolution>10</targetResolution>
+      <upsampling>Nearest</upsampling>
+      <downsampling>First</downsampling>
+      <flagDownsampling>First</flagDownsampling>
+      <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+    </parameters>
+  </node>
+  <node id="resample_B1">
+    <operator>Resample</operator>
+    <sources>
+      <sourceProduct refid="read_B1" />
+    </sources>
+    <parameters>
+      <targetResolution>10</targetResolution>
+      <upsampling>Nearest</upsampling>
+      <downsampling>First</downsampling>
+      <flagDownsampling>First</flagDownsampling>
+      <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+    </parameters>
+  </node>
+  <node id="resample_B2">
+    <operator>Resample</operator>
+    <sources>
+      <sourceProduct refid="read_B2" />
+    </sources>
+    <parameters>
+      <targetResolution>10</targetResolution>
+      <upsampling>Nearest</upsampling>
+      <downsampling>First</downsampling>
+      <flagDownsampling>First</flagDownsampling>
+      <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+    </parameters>
+  </node>
+  <node id="ndvi_A1">
+      <operator>NdviOp</operator>
+      <sources>
+        <sourceProduct refid="resample_A1" />
+      </sources>
+      <parameters>
+        <redFactor>1.0</redFactor>
+        <nirFactor>1.0</nirFactor>
+        <redSourceBand>B4</redSourceBand>
+        <nirSourceBand>B8</nirSourceBand>
+      </parameters>
+  </node>
+  <node id="ndvi_A2">
+      <operator>NdviOp</operator>
+      <sources>
+        <sourceProduct refid="resample_A2" />
+      </sources>
+      <parameters>
+        <redFactor>1.0</redFactor>
+        <nirFactor>1.0</nirFactor>
+        <redSourceBand>B4</redSourceBand>
+        <nirSourceBand>B8</nirSourceBand>
+      </parameters>
+  </node>
+  <node id="ndvi_B1">
+      <operator>NdviOp</operator>
+      <sources>
+        <sourceProduct refid="resample_B1" />
+      </sources>
+      <parameters>
+        <redFactor>1.0</redFactor>
+        <nirFactor>1.0</nirFactor>
+        <redSourceBand>B4</redSourceBand>
+        <nirSourceBand>B8</nirSourceBand>
+      </parameters>
+  </node>
+  <node id="ndvi_B2">
+      <operator>NdviOp</operator>
+      <sources>
+        <sourceProduct refid="resample_B2" />
+      </sources>
+      <parameters>
+        <redFactor>1.0</redFactor>
+        <nirFactor>1.0</nirFactor>
+        <redSourceBand>B4</redSourceBand>
+        <nirSourceBand>B8</nirSourceBand>
+      </parameters>
+  </node>
+  <node id="collocate_A">
+      <operator>Collocate</operator>
+      <sources>
+        <sourceProduct refid="ndvi_A1"/>
+        <sourceProduct.1 refid="ndvi_A2"/>
+      </sources>
+      <parameters>
+        <sourceProductPaths/>
+        <masterProductName/>
+        <targetProductType>COLLOCATED</targetProductType>
+        <renameMasterComponents>true</renameMasterComponents>
+        <renameSlaveComponents>true</renameSlaveComponents>
+        <masterComponentPattern>${ORIGINAL_NAME}_M</masterComponentPattern>
+        <slaveComponentPattern>${ORIGINAL_NAME}_S${SLAVE_NUMBER_ID}</slaveComponentPattern>
+        <resamplingType>NEAREST_NEIGHBOUR</resamplingType>
+      </parameters>
+  </node>
+  <node id="collocate_B">
+      <operator>Collocate</operator>
+      <sources>
+        <sourceProduct refid="ndvi_B1"/>
+        <sourceProduct.1 refid="ndvi_B2"/>
+      </sources>
+      <parameters>
+        <sourceProductPaths/>
+        <masterProductName/>
+        <targetProductType>COLLOCATED</targetProductType>
+        <renameMasterComponents>true</renameMasterComponents>
+        <renameSlaveComponents>true</renameSlaveComponents>
+        <masterComponentPattern>${ORIGINAL_NAME}_M</masterComponentPattern>
+        <slaveComponentPattern>${ORIGINAL_NAME}_S${SLAVE_NUMBER_ID}</slaveComponentPattern>
+        <resamplingType>NEAREST_NEIGHBOUR</resamplingType>
+      </parameters>
+  </node>
+  <node id="max_ndvi_A">
+      <operator>BandMaths</operator>
+      <sources>
+        <sourceProduct refid="collocate_A"/>
+      </sources>
+      <parameters>
+        <targetBands>
+          <targetBand>
+            <name>max_ndvi</name>
+            <type>float32</type>
+            <expression>max(ndvi_M,ndvi_S)</expression>
+              <description/>
+            <unit/>
+            <noDataValue>0.0</noDataValue>
+          </targetBand>
+        </targetBands>
+        <variables/>
+      </parameters>
+  </node>
+  <node id="max_ndvi_B">
+      <operator>BandMaths</operator>
+      <sources>
+        <sourceProduct refid="collocate_B"/>
+      </sources>
+      <parameters>
+        <targetBands>
+          <targetBand>
+            <name>max_ndvi</name>
+            <type>float32</type>
+            <expression>max(ndvi_M,ndvi_S)</expression>
+              <description/>
+            <unit/>
+            <noDataValue>0.0</noDataValue>
+          </targetBand>
+        </targetBands>
+        <variables/>
+      </parameters>
+  </node>
+  <node id="mosaicing">
+    <operator>Mosaic</operator>
+    <sources>
+      <sourceProduct refid="max_ndvi_A"/>
+      <sourceProduct.1 refid="max_ndvi_B"/>
+    </sources>
+    <parameters>
+      <variables>
+        <variable>
+          <name>max_ndvi</name>
+          <expression>max_ndvi</expression>
+        </variable>
+      </variables>
+      <combine>OR</combine>
+      <crs>PROJCS[&quot;UTM Zone 32 / World Geodetic System 1984&quot;, 
+      GEOGCS[&quot;World Geodetic System 1984&quot;, 
+        DATUM[&quot;World Geodetic System 1984&quot;, 
+          SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], 
+          AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], 
+        PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], 
+        UNIT[&quot;degree&quot;, 0.017453292519943295], 
+        AXIS[&quot;Geodetic longitude&quot;, EAST], 
+        AXIS[&quot;Geodetic latitude&quot;, NORTH]], 
+      PROJECTION[&quot;Transverse_Mercator&quot;], 
+      PARAMETER[&quot;central_meridian&quot;, 9.0], 
+      PARAMETER[&quot;latitude_of_origin&quot;, 0.0], 
+      PARAMETER[&quot;scale_factor&quot;, 0.9996], 
+      PARAMETER[&quot;false_easting&quot;, 500000.0], 
+      PARAMETER[&quot;false_northing&quot;, 0.0], 
+      UNIT[&quot;m&quot;, 1.0], 
+      AXIS[&quot;Easting&quot;, EAST], 
+      AXIS[&quot;Northing&quot;, NORTH]]</crs>
+      <orthorectify>false</orthorectify>
+      <elevationModelName>SRTM 3Sec</elevationModelName>
+      <westBound>11.393460776825952</westBound>
+      <northBound>43.3474403883624</northBound>
+      <eastBound>13.919972839834166</eastBound>
+      <southBound>41.404034745477944</southBound>
+      <pixelSizeX>10.0</pixelSizeX>
+      <pixelSizeY>10.0</pixelSizeY>
+      <resampling>Nearest</resampling>
+    </parameters>
+  </node>
+</graph>
