@@ -1,0 +1,33 @@
+<graph id="Graph">
+    <version>1.0</version>
+    <node id="Resample">
+        <operator>Resample</operator>
+        <sources>
+            <sourceProduct>${sourceProduct}</sourceProduct>
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+            <referenceBand/>
+            <targetWidth/>
+            <targetHeight/>
+            <targetResolution>10</targetResolution>
+            <upsampling>Nearest</upsampling>
+            <downsampling>First</downsampling>
+            <flagDownsampling>First</flagDownsampling>
+            <resamplingPreset/>
+            <bandResamplings/>
+            <resampleOnPyramidLevels>true</resampleOnPyramidLevels>
+        </parameters>
+    </node>
+    <node id="NdviOp">
+        <operator>NdviOp</operator>
+        <sources>
+            <sourceProduct refid="Resample"/>
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+            <redFactor>1.0</redFactor>
+            <nirFactor>1.0</nirFactor>
+            <redSourceBand>B4</redSourceBand>
+            <nirSourceBand>B8</nirSourceBand>
+        </parameters>
+    </node>
+</graph>
